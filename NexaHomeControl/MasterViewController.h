@@ -10,12 +10,13 @@
 
 #import "Models.h"
 #import "NexaHomeHandler.h"
+#import "DeviceTableCell.h"
 
 @class DetailViewController;
 
 @interface MasterViewController : UITableViewController
 
 @property (strong, nonatomic) DetailViewController *detailViewController;
-@property (strong, nonatomic) NexaHomeHandler *nexaHomeHandler;
+//@property (strong, nonatomic) NexaHomeHandler *nexaHomeHandler;
 
 @end

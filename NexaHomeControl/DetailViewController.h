@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Models.h"
 
 @interface DetailViewController : UIViewController <UISplitViewControllerDelegate>
 

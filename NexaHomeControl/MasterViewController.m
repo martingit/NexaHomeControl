@@ -11,12 +11,14 @@
 #import "DetailViewController.h"
 
 @interface MasterViewController () {
-    //NSMutableArray *_objects;
+    NSMutableArray *_objects;
     Status *_status;
 }
+-(NexaHomeHandler*) createNexaHomeHandler;
 @end
 
 @implementation MasterViewController
+static NSString *MyIdentifier = @"MyReuseIdentifier";
 
 - (void)awakeFromNib
 {
@@ -43,8 +45,18 @@
     [settingsButton setTitleTextAttributes:dict forState:UIControlStateNormal];
     
     self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
-    self.nexaHomeHandler = [[NexaHomeHandler alloc] initWithAddress:@"macmini.lan" andPort:8080 andPassword:@""];
-    _status = [self.nexaHomeHandler getStatus];
+    NexaHomeHandler* nexaHomeHandler = [self createNexaHomeHandler];
+    _status = [nexaHomeHandler getStatus];
+    
+    _objects = [[NSMutableArray alloc]init];
+    for (int i = 0; i < _status.devices.count; i++) {
+        Device *currentDevice = [_status.devices objectAtIndex:i];
+        [_objects addObject:[[DeviceTableCell alloc] initWithDevice:currentDevice andViewController:self]];
+    }
+    
+}
+-(NexaHomeHandler*) createNexaHomeHandler{
+    return [[NexaHomeHandler alloc] initWithAddress:@"192.168.1.101" andPort:8080 andPassword:@"" andUseSSL:false];
 }
 
 - (void)didReceiveMemoryWarning
@@ -62,7 +74,25 @@
     //NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
     //[self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
-
+- (void)callDevice:(id)sender{
+    
+    UISwitch *uiSwitch = (UISwitch *)sender;
+    int deviceId = (int)uiSwitch.tag;
+    bool command = uiSwitch.on;
+    uiSwitch.enabled = false;
+    
+    NSLog(@"Call from %d with value %@", deviceId, command ? @"on" : @"off");
+    
+    NexaHomeHandler* nexaHomeHandler = [self createNexaHomeHandler];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, (unsigned long)NULL), ^(void) {
+        bool sendOk = [nexaHomeHandler sendCommand:command withDeviceId:deviceId];
+        NSLog(@"Send ok: %@", sendOk ? @"yes" : @"no");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            uiSwitch.enabled = true;
+        });
+    });
+}
 #pragma mark - Table View
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -72,15 +102,13 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return _status.devices.count;
+    return _objects.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-
-    Device *object = _status.devices[indexPath.row];
-    cell.textLabel.text = [object name];
+    TableCell *row = [_objects objectAtIndex:indexPath.row];
+    UITableViewCell *cell = [row getCell:tableView :MyIdentifier];
     return cell;
 }
 
@@ -100,27 +128,14 @@
     }
 }
 
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        NSDate *object = _status.devices[indexPath.row];
-        self.detailViewController.detailItem = object;
+        DeviceTableCell *object = _objects[indexPath.row];
+        self.detailViewController.detailItem = object.device;
+    }
+    else{
+        [self performSegueWithIdentifier:@"showDetail" sender:self];
     }
 }
 
@@ -128,8 +143,8 @@
 {
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        NSDate *object = _status.devices[indexPath.row];
-        [[segue destinationViewController] setDetailItem:object];
+        DeviceTableCell *object = _objects[indexPath.row];
+        [[segue destinationViewController] setDetailItem:object.device];
     }
 }
 

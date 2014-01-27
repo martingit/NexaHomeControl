@@ -16,10 +16,16 @@
 
 @end
 
+@interface NexaHomeControlTests(){
+    NexaHomeHandler *_nexaHomeHandler;
+}
+@end
+
 @implementation NexaHomeControlTests
 
 - (void)setUp
 {
+    _nexaHomeHandler = [[NexaHomeHandler alloc] initWithAddress:@"192.168.1.101" andPort:8080 andPassword:@"" andUseSSL:false];
     [super setUp];
     // Put setup code here. This method is called before the invocation of each test method in the class.
 }
@@ -27,6 +33,7 @@
 - (void)tearDown
 {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
+    _nexaHomeHandler = nil;
     [super tearDown];
 }
 
@@ -57,23 +64,19 @@
 #pragma text Integration Tests
 
 - (void) testIntegrationWithNexaHomeGetStatus{
-    NexaHomeHandler* handler = [[NexaHomeHandler alloc] initWithAddress:@"192.168.1.101" andPort:8080 andPassword:@""];
-    Status* status = [handler getStatus];
+    Status* status = [_nexaHomeHandler getStatus];
     XCTAssertTrue(status.devices.count > 0, @"No devices found");
 }
 - (void) testIntegrationWithNexaHomeSendCommandOnToDevice8{
-    NexaHomeHandler* handler = [[NexaHomeHandler alloc] initWithAddress:@"192.168.1.101" andPort:8080 andPassword:@""];
-    bool sentOk = [handler sendCommand:true withDeviceId:8];
+    bool sentOk = [_nexaHomeHandler sendCommand:true withDeviceId:8];
     XCTAssertTrue(sentOk, @"Could not send Command ON to device=8");
 }
 - (void) testIntegrationWithNexaHomeSendCommandOffToDevice8{
-    NexaHomeHandler* handler = [[NexaHomeHandler alloc] initWithAddress:@"192.168.1.101" andPort:8080 andPassword:@""];
-    bool sentOk = [handler sendCommand:false withDeviceId:8];
+    bool sentOk = [_nexaHomeHandler sendCommand:false withDeviceId:8];
     XCTAssertTrue(sentOk, @"Could not send Command OFF to device=8");
 }
 - (void) testIntegrationWithNexaHomeDimDevice8ToLevel50{
-    NexaHomeHandler* handler = [[NexaHomeHandler alloc] initWithAddress:@"192.168.1.101" andPort:8080 andPassword:@""];
-    bool sentOk = [handler dimDevice:8 withLevel:50];
+    bool sentOk = [_nexaHomeHandler dimDevice:8 withLevel:50];
     XCTAssertTrue(sentOk, @"Could not dim device=8 to level=50");
 }
 @end

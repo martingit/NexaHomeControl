@@ -13,11 +13,11 @@
 #import "ObjectParser.h"
 
 @interface NexaHomeHandler : NSObject
-//@property(nonatomic, retain) Status *status;
 @property(nonatomic)NSString *address;
 @property(nonatomic)int port;
+@property(nonatomic)bool useSSL;
 @property(nonatomic)NSString *password;
--(id)initWithAddress: (NSString*) address andPort: (int) port andPassword: (NSString*) password;
+-(id)initWithAddress: (NSString*) address andPort: (int) port andPassword: (NSString*) password andUseSSL: (bool) useSSL;
 -(Status*) getStatus;
 -(bool) sendCommand: (bool) command withDeviceId: (int) deviceId;
 -(bool) dimDevice: (int) deviceId withLevel: (int) level;

@@ -12,7 +12,7 @@
 + (NSString *)stringWithUrl:(NSURL *)url
 {
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url
-                                                cachePolicy:NSURLRequestReturnCacheDataElseLoad
+                                                cachePolicy:NSURLRequestReloadIgnoringCacheData
                                             timeoutInterval:10];
     // Fetch the JSON response
     NSData *urlData;
