@@ -36,7 +36,7 @@
     Device* device = [[Device alloc] init];
     device.name = [TBXML valueOfAttributeNamed:@"name" forElement:element];
     device.index = [[TBXML valueOfAttributeNamed:@"id" forElement:element] intValue];
-    device.dimmable = [[TBXML valueOfAttributeNamed:@"dimmable" forElement:element] isEqualToString:@"yes"];
+    device.dimable = [[TBXML valueOfAttributeNamed:@"dimmable" forElement:element] isEqualToString:@"yes"];
     NSString* level =[TBXML valueOfAttributeNamed:@"level" forElement:element];
     if (level.length > 0){
         device.level = [level intValue];

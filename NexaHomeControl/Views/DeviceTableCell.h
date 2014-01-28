@@ -12,6 +12,7 @@
 @interface DeviceTableCell : TableCell
 @property (nonatomic, retain) Device *device;
 @property(nonatomic, retain) UISwitch *uiSwitch;
+@property (strong, nonatomic) id controller;
 - (id)initWithDevice:(Device *)device andViewController: (id)controller;
 
 @end

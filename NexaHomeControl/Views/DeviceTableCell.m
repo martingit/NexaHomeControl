@@ -13,6 +13,7 @@
 - (id)initWithDevice:(Device *)device andViewController: (id)controller{
     self = [super init];
     if (self) {
+        self.controller = controller;
         self.device = device;
         self.Title = device.name;
         self.CanMove = false;

@@ -11,7 +11,7 @@
 #import "DetailViewController.h"
 
 @interface MasterViewController () {
-    NSMutableArray *_objects;
+    NSMutableArray *_sections;
     Status *_status;
 }
 -(NexaHomeHandler*) createNexaHomeHandler;
@@ -29,14 +29,48 @@ static NSString *MyIdentifier = @"MyReuseIdentifier";
     [super awakeFromNib];
 }
 
+- (void)reloadStatusTable
+{
+    NexaHomeHandler* nexaHomeHandler = [self createNexaHomeHandler];
+    _status = [nexaHomeHandler getStatus];
+    
+    TableSection *modeSection = [[TableSection alloc] init];
+    modeSection.name = @"Current mode";
+    modeSection.items = [[NSMutableArray alloc]init];
+    
+    [modeSection.items addObject:[[TableCell alloc] initWithName:_status.mode]];
+    
+    TableSection *deviceSection = [[TableSection alloc] init];
+    deviceSection.name = @"Devices";
+    deviceSection.items = [[NSMutableArray alloc]init];
+    
+    _sections = [[NSMutableArray alloc]init];
+    
+    for (int i = 0; i < _status.devices.count; i++) {
+        Device *currentDevice = [_status.devices objectAtIndex:i];
+        if (currentDevice.dimable){
+            [deviceSection.items addObject:[[DimableDeviceTableCell alloc] initWithDevice:currentDevice andViewController:self]];
+        
+        }
+        else{
+            [deviceSection.items addObject:[[DeviceTableCell alloc] initWithDevice:currentDevice andViewController:self]];
+        }
+    }
+    [_sections addObject:modeSection];
+    [_sections addObject:deviceSection];
+    [self.tableView reloadData];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
-    //self.navigationItem.leftBarButtonItem = self.editButtonItem;
-
-    //UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
-    //self.navigationItem.rightBarButtonItem = addButton;
+    
+    UIRefreshControl *refresh = [[UIRefreshControl alloc] init];
+    refresh.attributedTitle = [[NSAttributedString alloc] initWithString:@"Pull to Refresh"];
+    
+    [refresh addTarget:self action:@selector(refreshStatus:) forControlEvents:UIControlEventValueChanged];
+    
+    self.refreshControl = refresh;
     
     UIBarButtonItem *settingsButton = [[UIBarButtonItem alloc] initWithTitle:@"\u2699" style:UIBarButtonItemStylePlain target:self action:@selector(openSettings:)];
     self.navigationItem.rightBarButtonItem = settingsButton;
@@ -45,18 +79,18 @@ static NSString *MyIdentifier = @"MyReuseIdentifier";
     [settingsButton setTitleTextAttributes:dict forState:UIControlStateNormal];
     
     self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
-    NexaHomeHandler* nexaHomeHandler = [self createNexaHomeHandler];
-    _status = [nexaHomeHandler getStatus];
-    
-    _objects = [[NSMutableArray alloc]init];
-    for (int i = 0; i < _status.devices.count; i++) {
-        Device *currentDevice = [_status.devices objectAtIndex:i];
-        [_objects addObject:[[DeviceTableCell alloc] initWithDevice:currentDevice andViewController:self]];
-    }
+    [self reloadStatusTable];
     
 }
 -(NexaHomeHandler*) createNexaHomeHandler{
     return [[NexaHomeHandler alloc] initWithAddress:@"192.168.1.101" andPort:8080 andPassword:@"" andUseSSL:false];
+}
+- (void)stopRefresh:(id)sender{
+    [self.refreshControl endRefreshing];
+}
+-(void)refreshStatus:(id)sender{
+    [self reloadStatusTable];
+    [self performSelector:@selector(stopRefresh:) withObject:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -65,23 +99,16 @@ static NSString *MyIdentifier = @"MyReuseIdentifier";
     // Dispose of any resources that can be recreated.
 }
 
-- (void)openSettings:(id)sender
-{
-    //if (!_objects) {
-    //    _objects = [[NSMutableArray alloc] init];
-    //}
-    //[_objects insertObject:[NSDate date] atIndex:0];
-    //NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-    //[self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+- (void)openSettings:(id)sender {
 }
-- (void)callDevice:(id)sender{
+- (void)callDevice:(id)sender {
     
     UISwitch *uiSwitch = (UISwitch *)sender;
     int deviceId = (int)uiSwitch.tag;
     bool command = uiSwitch.on;
     uiSwitch.enabled = false;
     
-    NSLog(@"Call from %d with value %@", deviceId, command ? @"on" : @"off");
+    NSLog(@"Call to %d with value %@", deviceId, command ? @"on" : @"off");
     
     NexaHomeHandler* nexaHomeHandler = [self createNexaHomeHandler];
     
@@ -93,22 +120,41 @@ static NSString *MyIdentifier = @"MyReuseIdentifier";
         });
     });
 }
+- (void)dimDevice:(UISlider*)sender {
+    int deviceId = (int)sender.tag;
+    int level = (int)sender.value;
+    sender.enabled = false;
+    
+    NSLog(@"Dimm device %d with level %d", deviceId, level);
+    
+    NexaHomeHandler* nexaHomeHandler = [self createNexaHomeHandler];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, (unsigned long)NULL), ^(void) {
+        bool sendOk = [nexaHomeHandler dimDevice:deviceId withLevel:level];
+        NSLog(@"Send ok: %@", sendOk ? @"yes" : @"no");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            sender.enabled = true;
+        });
+    });
+}
 #pragma mark - Table View
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 1;
+    return _sections.count;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return _objects.count;
+    TableSection* currentSection = (TableSection*)[_sections objectAtIndex:section];
+    return currentSection.items.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    TableCell *row = [_objects objectAtIndex:indexPath.row];
-    UITableViewCell *cell = [row getCell:tableView :MyIdentifier];
+    TableSection* tableSection = [_sections objectAtIndex:indexPath.section];
+    TableCell* tableCell = [tableSection.items objectAtIndex:indexPath.row];
+    UITableViewCell *cell = [tableCell getCell:tableView :MyIdentifier];
     return cell;
 }
 
@@ -118,21 +164,34 @@ static NSString *MyIdentifier = @"MyReuseIdentifier";
     return NO;
 }
 
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    TableSection *currentSection = [_sections objectAtIndex:section];
+    return currentSection.name;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    return 0;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [_status.devices removeObjectAtIndex:indexPath.row];
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
+    TableSection* tableSection = [_sections objectAtIndex:indexPath.section];
+    TableCell* tableCell = [tableSection.items objectAtIndex:indexPath.row];
+    if ([tableCell class] == [DimableDeviceTableCell class]){
+        return 66;
+    }
+    else{
+        return 44;
     }
 }
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        DeviceTableCell *object = _objects[indexPath.row];
-        self.detailViewController.detailItem = object.device;
+        TableSection* tableSection = [_sections objectAtIndex:indexPath.section];
+        TableCell* tableCell = [tableSection.items objectAtIndex:indexPath.row];
+
+        if ([tableCell class] == [DeviceTableCell class]){
+            self.detailViewController.detailItem = ((DeviceTableCell*)tableCell).device;
+        }
+        
     }
     else{
         [self performSegueWithIdentifier:@"showDetail" sender:self];
@@ -143,8 +202,12 @@ static NSString *MyIdentifier = @"MyReuseIdentifier";
 {
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        DeviceTableCell *object = _objects[indexPath.row];
-        [[segue destinationViewController] setDetailItem:object.device];
+        TableSection* tableSection = [_sections objectAtIndex:indexPath.section];
+        TableCell* tableCell = [tableSection.items objectAtIndex:indexPath.row];
+        if ([tableCell class] == [DeviceTableCell class]){
+            [[segue destinationViewController] setDetailItem:((DeviceTableCell*)tableCell).device];
+        }
+        
     }
 }
 

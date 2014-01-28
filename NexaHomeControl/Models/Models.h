@@ -12,7 +12,7 @@
 @interface Device : NSObject
 @property(nonatomic)NSString *name;
 @property(nonatomic)int index;
-@property(nonatomic)bool dimmable;
+@property(nonatomic)bool dimable;
 @property(nonatomic)NSInteger level;
 @property(nonatomic)bool status;
 @end

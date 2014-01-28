@@ -45,6 +45,9 @@
 		5B0B1C451896DA570007B4FD /* IASKTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B0B1C371896DA570007B4FD /* IASKTextField.m */; };
 		5B0B1C4C1896DE8E0007B4FD /* DeviceTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B0B1C4B1896DE8E0007B4FD /* DeviceTableCell.m */; };
 		5B0B1C571896F4370007B4FD /* TableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B0B1C561896F4370007B4FD /* TableCell.m */; };
+		5B0B1C5A189793DB0007B4FD /* TableSection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B0B1C59189793DB0007B4FD /* TableSection.m */; };
+		5B0B1C5D1897981D0007B4FD /* DimableDeviceTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B0B1C5C1897981D0007B4FD /* DimableDeviceTableCell.m */; };
+		5B0B1C6018979AB80007B4FD /* DimableDeviceTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B0B1C5F18979AB80007B4FD /* DimableDeviceTableViewCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -126,6 +129,12 @@
 		5B0B1C531896ED930007B4FD /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		5B0B1C551896F4370007B4FD /* TableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableCell.h; path = Views/TableCell.h; sourceTree = "<group>"; };
 		5B0B1C561896F4370007B4FD /* TableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TableCell.m; path = Views/TableCell.m; sourceTree = "<group>"; };
+		5B0B1C58189793DB0007B4FD /* TableSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableSection.h; path = Views/TableSection.h; sourceTree = "<group>"; };
+		5B0B1C59189793DB0007B4FD /* TableSection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TableSection.m; path = Views/TableSection.m; sourceTree = "<group>"; };
+		5B0B1C5B1897981D0007B4FD /* DimableDeviceTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DimableDeviceTableCell.h; path = Views/DimableDeviceTableCell.h; sourceTree = "<group>"; };
+		5B0B1C5C1897981D0007B4FD /* DimableDeviceTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DimableDeviceTableCell.m; path = Views/DimableDeviceTableCell.m; sourceTree = "<group>"; };
+		5B0B1C5E18979AB80007B4FD /* DimableDeviceTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DimableDeviceTableViewCell.h; path = Views/DimableDeviceTableViewCell.h; sourceTree = "<group>"; };
+		5B0B1C5F18979AB80007B4FD /* DimableDeviceTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DimableDeviceTableViewCell.m; path = Views/DimableDeviceTableViewCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -332,8 +341,14 @@
 			children = (
 				5B0B1C551896F4370007B4FD /* TableCell.h */,
 				5B0B1C561896F4370007B4FD /* TableCell.m */,
+				5B0B1C58189793DB0007B4FD /* TableSection.h */,
+				5B0B1C59189793DB0007B4FD /* TableSection.m */,
 				5B0B1C4A1896DE8E0007B4FD /* DeviceTableCell.h */,
 				5B0B1C4B1896DE8E0007B4FD /* DeviceTableCell.m */,
+				5B0B1C5B1897981D0007B4FD /* DimableDeviceTableCell.h */,
+				5B0B1C5C1897981D0007B4FD /* DimableDeviceTableCell.m */,
+				5B0B1C5E18979AB80007B4FD /* DimableDeviceTableViewCell.h */,
+				5B0B1C5F18979AB80007B4FD /* DimableDeviceTableViewCell.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -445,10 +460,13 @@
 				5B0B1C381896DA570007B4FD /* IASKAppSettingsViewController.m in Sources */,
 				5B0B1C441896DA570007B4FD /* IASKSwitch.m in Sources */,
 				5B0B1C3F1896DA570007B4FD /* IASKSpecifier.m in Sources */,
+				5B0B1C5D1897981D0007B4FD /* DimableDeviceTableCell.m in Sources */,
+				5B0B1C5A189793DB0007B4FD /* TableSection.m in Sources */,
 				5B0B1C4C1896DE8E0007B4FD /* DeviceTableCell.m in Sources */,
 				5B0B1C411896DA570007B4FD /* IASKPSTextFieldSpecifierViewCell.m in Sources */,
 				5B0B1BDD18959C9B0007B4FD /* MasterViewController.m in Sources */,
 				5B0B1C431896DA570007B4FD /* IASKSlider.m in Sources */,
+				5B0B1C6018979AB80007B4FD /* DimableDeviceTableViewCell.m in Sources */,
 				5B0B1C131895A1480007B4FD /* Models.m in Sources */,
 				5B0B1BD018959C9B0007B4FD /* main.m in Sources */,
 				5B0B1C0418959CD60007B4FD /* TBXML.m in Sources */,
