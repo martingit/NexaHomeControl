@@ -17,10 +17,11 @@
     self.uiSlider.value = newStep * self.stepValue;
     //NSLog(@"UISlider value: %f", self.uiSlider.value);
 }
--(void)sendCommand:(id)sender{
+-(void)dimCommand:(id)sender{
     int currentValue = (int)self.uiSlider.value;
+    int deviceId = (int)self.device.index;
     if (currentValue != self.lastStep){
-        NSLog(@"UISlider %d value: %f", self.uiSlider.tag, self.uiSlider.value);
+        NSLog(@"UISlider %d value: %d", deviceId, currentValue);
         self.lastStep = currentValue;
         [self.controller performSelector:@selector(dimDevice:) withObject:self.uiSlider];
     }
@@ -41,7 +42,7 @@
         self.uiSlider.tag = self.device.index;
         self.uiSlider.value = self.device.level;
         [self.uiSlider addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged];
-        [self.uiSlider addTarget:self action:@selector(sendCommand:) forControlEvents:UIControlEventTouchUpInside];
+        [self.uiSlider addTarget:self action:@selector(dimCommand:) forControlEvents:UIControlEventTouchUpInside];
     }
     return self;
 }
@@ -50,7 +51,10 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
         cell = [[DimableDeviceTableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:cellIdentifier];
+   
     }
+    [self removeSubview:cell];
+    
     cell.textLabel.text = self.Title;
     cell.showsReorderControl = self.CanMove;
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;

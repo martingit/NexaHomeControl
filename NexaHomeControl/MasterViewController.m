@@ -117,6 +117,7 @@ static NSString *MyIdentifier = @"MyReuseIdentifier";
         NSLog(@"Send ok: %@", sendOk ? @"yes" : @"no");
         dispatch_async(dispatch_get_main_queue(), ^{
             uiSwitch.enabled = true;
+            [self reloadStatusTable];
         });
     });
 }
@@ -134,7 +135,8 @@ static NSString *MyIdentifier = @"MyReuseIdentifier";
         NSLog(@"Send ok: %@", sendOk ? @"yes" : @"no");
         dispatch_async(dispatch_get_main_queue(), ^{
             sender.enabled = true;
-        });
+            [self reloadStatusTable];
+       });
     });
 }
 #pragma mark - Table View

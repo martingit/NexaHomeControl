@@ -14,5 +14,5 @@
 @property(nonatomic, retain) UISwitch *uiSwitch;
 @property (strong, nonatomic) id controller;
 - (id)initWithDevice:(Device *)device andViewController: (id)controller;
-
+- (void) removeSubview: (UIView*)view;
 @end
